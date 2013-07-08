@@ -18,6 +18,7 @@ object Users extends Controller {
   }
 
   def create = JsonAction[User] { user =>
+  println(user)
     User.save(user, WriteConcern.Safe)
     Ok(Json.toJson(user))
   }
