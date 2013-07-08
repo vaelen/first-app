@@ -17,7 +17,8 @@ case class User(
   username: String,
   deviceId: String,
   deviceType: String
-)
+//) { def defaults = copy(id = if(id.isInstanceOf[ObjectId]) id else new ObjectId) }
+) { def defaults = copy(id = new ObjectId) }
 
 object User extends UserDao with UserJson
 
@@ -47,7 +48,7 @@ trait UserJson {
   }
 
   implicit val userJsonRead = (
-    (__ \ 'id).read[ObjectId] ~
+    (__ \ 'id).readNullable[ObjectId].map { l => l.getOrElse(new ObjectId) } ~
     (__ \ 'username).read[String] ~
     (__ \ 'deviceId).read[String] ~
     (__ \ 'deviceType).read[String]

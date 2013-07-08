@@ -18,9 +18,12 @@ object Users extends Controller {
   }
 
   def create = JsonAction[User] { user =>
-  println(user)
-    User.save(user, WriteConcern.Safe)
-    Ok(Json.toJson(user))
+    User.findOneByUsername(user.username).map { existingUser =>
+      Status(409)("User Already Exists")
+    } getOrElse {
+      User.save(user, WriteConcern.Safe)
+      Ok(Json.toJson(user))
+    }
   }
 
   def view(username: String) = Action {
