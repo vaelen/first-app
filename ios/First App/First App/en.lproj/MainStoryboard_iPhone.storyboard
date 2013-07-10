@@ -13,24 +13,28 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Create Account" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Kxw-gS-Fmi">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="xMg-PN-8r5"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="User Name" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="fhy-ow-Q6G">
                                 <accessibility key="accessibilityConfiguration" hint="User Name"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textField>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dab-j2-1W6">
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="21" id="fHj-KI-Kux"/>
+                                    <constraint firstAttribute="height" constant="30" id="iN0-eB-e6E"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
+                                <connections>
+                                    <outlet property="delegate" destination="2" id="4Cg-uX-xJb"/>
+                                </connections>
+                            </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aF5-zU-V5l">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="43" id="EbY-XC-Igr"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Sign Up">
                                     <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
@@ -43,19 +47,37 @@
                                     <action selector="signUpAction:" destination="2" eventType="touchUpInside" id="Xll-20-uMy"/>
                                 </connections>
                             </button>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TfL-g4-MMQ">
+                                <subviews>
+                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="10" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="Dab-j2-1W6">
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="Dab-j2-1W6" firstAttribute="bottom" secondItem="TfL-g4-MMQ" secondAttribute="bottom" type="default" id="Lqj-RB-W9N"/>
+                                    <constraint firstItem="Dab-j2-1W6" firstAttribute="centerY" secondItem="TfL-g4-MMQ" secondAttribute="centerY" type="default" id="OpQ-Hf-5Zy"/>
+                                    <constraint firstItem="Dab-j2-1W6" firstAttribute="trailing" secondItem="TfL-g4-MMQ" secondAttribute="trailing" type="default" id="aTW-pW-17I"/>
+                                    <constraint firstItem="Dab-j2-1W6" firstAttribute="centerX" secondItem="TfL-g4-MMQ" secondAttribute="centerX" type="default" id="gQf-jU-Pwr"/>
+                                    <constraint firstItem="Dab-j2-1W6" firstAttribute="leading" secondItem="TfL-g4-MMQ" secondAttribute="leading" type="default" id="qTo-vU-AEU"/>
+                                    <constraint firstItem="Dab-j2-1W6" firstAttribute="top" secondItem="TfL-g4-MMQ" secondAttribute="top" type="default" id="rla-eq-Afs"/>
+                                </constraints>
+                            </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="Kxw-gS-Fmi" firstAttribute="top" secondItem="3" secondAttribute="top" constant="20" symbolic="YES" type="default" id="1Iu-Fk-LJ5"/>
-                            <constraint firstItem="Dab-j2-1W6" firstAttribute="leading" secondItem="3" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="8mH-KH-T1s"/>
-                            <constraint firstAttribute="bottom" secondItem="aF5-zU-V5l" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="Qjy-73-l1i"/>
-                            <constraint firstItem="Dab-j2-1W6" firstAttribute="top" secondItem="fhy-ow-Q6G" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="R0d-Py-XNu"/>
-                            <constraint firstAttribute="trailing" secondItem="Dab-j2-1W6" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="TNl-T4-f7m"/>
-                            <constraint firstAttribute="trailing" secondItem="fhy-ow-Q6G" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="UjS-o7-rZn"/>
-                            <constraint firstItem="fhy-ow-Q6G" firstAttribute="top" secondItem="Kxw-gS-Fmi" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="Wng-im-fg1"/>
-                            <constraint firstItem="aF5-zU-V5l" firstAttribute="centerX" secondItem="Dab-j2-1W6" secondAttribute="centerX" type="default" id="ZIr-b6-Z8M"/>
-                            <constraint firstItem="fhy-ow-Q6G" firstAttribute="leading" secondItem="3" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="dVb-Ap-vWU"/>
-                            <constraint firstItem="Kxw-gS-Fmi" firstAttribute="centerX" secondItem="fhy-ow-Q6G" secondAttribute="centerX" type="default" id="zUz-Qg-a9t"/>
+                            <constraint firstAttribute="trailing" secondItem="fhy-ow-Q6G" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="9l4-2E-tti"/>
+                            <constraint firstAttribute="trailing" secondItem="TfL-g4-MMQ" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="OsF-a0-31e"/>
+                            <constraint firstAttribute="bottom" secondItem="aF5-zU-V5l" secondAttribute="bottom" constant="20" symbolic="YES" type="default" id="Vyq-i4-h5d"/>
+                            <constraint firstItem="aF5-zU-V5l" firstAttribute="top" secondItem="TfL-g4-MMQ" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="WHf-Uj-724"/>
+                            <constraint firstItem="TfL-g4-MMQ" firstAttribute="centerX" secondItem="aF5-zU-V5l" secondAttribute="centerX" type="default" id="XNU-yI-4jP"/>
+                            <constraint firstItem="Kxw-gS-Fmi" firstAttribute="centerX" secondItem="fhy-ow-Q6G" secondAttribute="centerX" type="default" id="ZS3-Nd-V9m"/>
+                            <constraint firstItem="TfL-g4-MMQ" firstAttribute="top" secondItem="fhy-ow-Q6G" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="gq1-Ua-Xa4"/>
+                            <constraint firstItem="TfL-g4-MMQ" firstAttribute="leading" secondItem="3" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="i8H-j5-JDt"/>
+                            <constraint firstItem="fhy-ow-Q6G" firstAttribute="leading" secondItem="3" secondAttribute="leading" constant="20" symbolic="YES" type="default" id="pHE-WS-er7"/>
+                            <constraint firstItem="Kxw-gS-Fmi" firstAttribute="top" secondItem="3" secondAttribute="top" constant="20" symbolic="YES" type="default" id="qSq-lo-EbH"/>
+                            <constraint firstItem="fhy-ow-Q6G" firstAttribute="top" secondItem="Kxw-gS-Fmi" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="rh6-UX-mo0"/>
                         </constraints>
                     </view>
                     <connections>

@@ -6,7 +6,10 @@
 //  Copyright (c) 2013 Andrew Young. All rights reserved.
 //
 
+#define createUserURL [NSURL URLWithString:@"http://localhost:9000/users"]
+
 #import "FirstAppViewController.h"
+#import "AFNetworking.h"
 
 @interface FirstAppViewController ()
 - (IBAction)signUpAction:(id)sender;
@@ -29,64 +32,72 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (IBAction)signUpAction:(id)sender {
+- (void)updateText:(NSString *)text
+{
+    [self updateText:text color:[UIColor blackColor]];
+}
+
+- (void)updateText:(NSString *)text color:(UIColor *)color
+{
+    self.resultsLabel.text = text;
+    self.resultsLabel.textColor = color;
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [textField resignFirstResponder];
+    return YES;
+}
+
+- (IBAction)signUpAction:(id)sender
+{
     NSString *username = self.usernameField.text;
     NSString *deviceId = @"1234";
     NSString *deviceType = @"iOS";
     
-    boolean_t accountCreated = false;
-    boolean_t errorOccured = false;
-    
-    NSString *message = @"Working...";
-    UIColor *textColor = [UIColor blackColor];
-    
-    self.resultsLabel.text = message;
-    self.resultsLabel.textColor = textColor;
+    [self updateText:@"Working..."];
     
     NSError* error;
     
     NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
-                          @"username", username,
-                          @"deviceId", deviceId,
-                          @"deviceType", deviceType,
+                          username, @"username",
+                          deviceId, @"deviceId",
+                          deviceType, @"deviceType",
                           nil];
+
     
     NSData* bodyData = [NSJSONSerialization dataWithJSONObject:data
                         options:NSJSONWritingPrettyPrinted
                         error:&error];
     
-    NSMutableURLRequest *postRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://www.apple.com"]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:createUserURL];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:bodyData];
     
-    // Set the request's content type to application/x-www-form-urlencoded
-    [postRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    NSString *bodyDataString = [[NSString alloc] initWithData:bodyData encoding:NSUTF8StringEncoding];
     
-    // Designate the request a POST request and specify its body data
-    [postRequest setHTTPMethod:@"POST"];
-    [postRequest setHTTPBody:[NSData dataWithBytes:[bodyData bytes] length:[bodyData length]]];
+    NSLog(@"Request Data: %@", bodyDataString);
     
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request
+        success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+            NSLog(@"Account Created.  Response Code: %ld, JSON: %@", (long)[response statusCode], JSON);
+            [self updateText:@"Account Created" color:[UIColor greenColor]];
+            
+        }
+        failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON){
+            if([response statusCode] == 409) {
+                NSLog(@"Account Already Exists.");
+                [self updateText:@"That Account Already Exists" color:[UIColor redColor]];
+            } else {
+                NSLog(@"An Error Occurred.  Response Code: %ld, Error: %@", (long)[response statusCode], [error localizedDescription]);
+                [self updateText:@"An Error Occurred" color:[UIColor redColor]];
+            }
+        }
+    ];
     
+    [operation start];
     
-    
-    NSDictionary* resultData = [NSJSONSerialization
-                                JSONObjectWithData:responseData
-                                options:kNilOptions
-                                error:&error];
-    
-    if(accountCreated) {
-        // Success
-        message = @"Account Created";
-        textColor = [UIColor greenColor];
-    } else if(errorOccured) {
-        // Error
-        message = [[NSString alloc] initWithFormat:@"Error: %@!", message];
-        textColor = [UIColor redColor];
-    } else {
-        // Account Already Exists
-        message = @"Account Already Exists";
-        textColor = [UIColor redColor];
-    }
-    
-    self.resultsLabel.text = message;
-    self.resultsLabel.textColor = textColor;
 }
+
 @end
