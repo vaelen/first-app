@@ -51,9 +51,10 @@
 
 - (IBAction)signUpAction:(id)sender
 {
+    UIDevice *device = [UIDevice currentDevice];
     NSString *username = self.usernameField.text;
-    NSString *deviceId = @"1234";
-    NSString *deviceType = @"iOS";
+    NSString *deviceId = [device.identifierForVendor UUIDString];
+    NSString *deviceType = [NSString stringWithFormat:@"%@|%@|%@", device.model, device.systemName, device.systemVersion];
     
     [self updateText:@"Working..."];
     
