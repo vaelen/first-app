@@ -89,9 +89,12 @@
             if([response statusCode] == 409) {
                 NSLog(@"Account Already Exists.");
                 [self updateText:@"That Account Already Exists" color:[UIColor redColor]];
+            } else if ([response statusCode] == 0) {
+                NSLog(@"Could Not Connect to the Server.  Response Code: %ld, Error: %@", (long)[response statusCode], [error localizedDescription]);
+                [self updateText:@"Could Not Connect To The Server" color:[UIColor redColor]];
             } else {
-                NSLog(@"An Error Occurred.  Response Code: %ld, Error: %@", (long)[response statusCode], [error localizedDescription]);
-                [self updateText:@"An Error Occurred" color:[UIColor redColor]];
+                NSLog(@"The Server Encountered An Error.  Response Code: %ld, Error: %@", (long)[response statusCode], [error localizedDescription]);
+                [self updateText:@"The Server Encountered An Error" color:[UIColor redColor]];
             }
         }
     ];
