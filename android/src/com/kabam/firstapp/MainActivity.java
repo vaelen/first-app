@@ -16,7 +16,9 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings.Secure;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -59,8 +61,10 @@ public class MainActivity extends Activity {
      * @param username The username to create.
      */
     protected void createAccount(String username) {
-    	String deviceType = "Android";
-    	String deviceId = "1234";
+    	String deviceType = String.format("%s|Android|%s", Build.MODEL, Build.VERSION.RELEASE);
+    	String deviceId = Secure.getString(FirstAppApplication.getAppContext().getContentResolver(), Secure.ANDROID_ID);;
+    	
+    	Log.d(TAG, String.format("Device Type: %s, Device ID: %s", deviceType, deviceId));
     	
     	Map<String, String> data = new LinkedHashMap<String, String>();
     	data.put("username", username);
