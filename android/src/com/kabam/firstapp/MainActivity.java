@@ -1,11 +1,10 @@
 package com.kabam.firstapp;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.http.client.ClientProtocolException;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.HttpPost;
@@ -16,7 +15,9 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
@@ -25,7 +26,8 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
-	public static final String CREATE_ACCOUNT_URL = "http://localhost:9000/users";
+	public static final String TAG = "First-App";
+	public static final String CREATE_ACCOUNT_URL = "http://10.0.2.2:9000/users";
 	public static final String ENCODING = "UTF-8";
 	public static final String CONTENT_TYPE = "application/json;charset=utf8";
 	
@@ -44,9 +46,11 @@ public class MainActivity extends Activity {
     }
     
     /** This is called when the 'Create Account' button is clicked. */
-    public void createAccount(View view) {
+    public void createAccountOnClick(View view) {
+    	Log.i(TAG, "createAccountOnClick");
     	EditText usernameField = (EditText) findViewById(R.id.username);
     	String username = usernameField.getText().toString();
+    	Log.i(TAG, String.format("Username: %s", username));
     	createAccount(username);
     }
     
@@ -55,8 +59,6 @@ public class MainActivity extends Activity {
      * @param username The username to create.
      */
     protected void createAccount(String username) {
-    	startingActivity("Working...");
-    	
     	String deviceType = "Android";
     	String deviceId = "1234";
     	
@@ -67,39 +69,69 @@ public class MainActivity extends Activity {
     	JSONObject jsonData = new JSONObject(data);
     	try {
 			String json = jsonData.toString(2);
-			sendCreateAccount(json);
+			new CreateAccountTask().execute(json);
 		} catch (JSONException e) {
+			Log.e(TAG, "Couldn't Create Request", e);
 			failure("Couldn't Create Request");
-			e.printStackTrace();
 		}
     }
     
-    protected void sendCreateAccount(String jsonData) {
-    	HttpClient httpClient = new DefaultHttpClient();
-    	HttpPost request = new HttpPost(CREATE_ACCOUNT_URL);
-    		try {
-    			request.setHeader("Content-Type", CONTENT_TYPE);
-    			request.setEntity(new StringEntity(jsonData, ENCODING));
-				httpClient.execute(request);
-				success("Account Created");
-			} catch (UnsupportedEncodingException e) {
-				// This should never happen.
-				failure("UTF-8 Not Supported");
-				e.printStackTrace();
+    private class CreateAccountTask extends AsyncTask<String, Void, String> {
+    	
+    	protected Throwable t;
+    	protected int statusCode;
+    	
+    	@Override
+    	protected void onPreExecute() {
+	      	startingActivity("Working...");
+    	}
+    	
+	    @Override
+    	protected String doInBackground(String... params) {
+	    	Log.i(TAG, "Contacting Server");
+	    	statusCode = 0;
+	    	String jsonData = params.length > 0 ? params[0] : "";
+	    	HttpClient httpClient = new DefaultHttpClient();
+	    	HttpPost request = new HttpPost(CREATE_ACCOUNT_URL);
+			try {
+				request.setHeader("Content-Type", CONTENT_TYPE);
+				request.setEntity(new StringEntity(jsonData, ENCODING));
+				HttpResponse response = httpClient.execute(request);
+				Log.d(TAG, String.format("Server Returned: %s", response.getStatusLine()));
+				statusCode = response.getStatusLine().getStatusCode();
 			} catch (HttpResponseException e) {
-				if(e.getStatusCode() == 409) {
-					failure("Account Already Exists");
-				} else {
-					failure("A Server Error Occurred");
-				}
-			} catch (ClientProtocolException e) {
-				// This shouldn't happen because the only ClientProtocolException we should get is a HttpResponseException.
-				failure(String.format("An Error Occurred: %s", e.getMessage()));
-				e.printStackTrace();
-			} catch (IOException e) {
-				failure(String.format("An Error Occurred: %s", e.getMessage()));
-				e.printStackTrace();
+				statusCode = e.getStatusCode();
+			} catch (Throwable t) {
+				Log.i(TAG, "Caught Exception During Server Communication", t);
+				statusCode = 0;
+				this.t = t;
 			}
+			return null;
+	    }
+	    
+	    @Override
+	    protected void onPostExecute(String result) {
+	    	if(statusCode >= 200 && statusCode < 300) {
+	    		success("Account Created");
+	    	} else if (statusCode > 0) {
+	    		Log.e(TAG, String.format("Bad Response Code: %d", statusCode));
+	    		if(statusCode == 409) {
+	    			failure("Account Already Exists");
+	    		} else {
+	    			failure("A Server Error Occurred");
+	    		}
+	    	} else if (t instanceof IOException) {
+	    		IOException e = (IOException) t;
+	    		Log.e(TAG, "IO Exception", e);
+	    		failure(String.format("A Network Error Occurred: %s", e.getMessage()));
+	    	} else if (t != null) {
+	    		Log.e(TAG, String.format("Unknown Exception: %s", t.toString()), t);
+	    		failure(String.format("An Error Occurred: %s", t.toString()));
+	    	} else {
+	    		Log.e(TAG, String.format("No Exception Was Thrown But Connection Was Not Successful.  Status Code: %d", statusCode));
+	    		failure("An Error Occurred");
+	    	}
+	    }
     }
     
     /** 
@@ -108,6 +140,7 @@ public class MainActivity extends Activity {
      * @param description The text to display.
      */
     public void startingActivity(String description) {
+    	Log.i(TAG, String.format("Starting: %s", description));
     	updateText(description, true, Color.BLACK);
     }
     
@@ -117,6 +150,7 @@ public class MainActivity extends Activity {
      * @param description The text to display.
      */
     public void success(String description) {
+    	Log.i(TAG, String.format("Success: %s", description));
     	updateText(description, false, Color.GREEN);
     }
     
@@ -126,6 +160,7 @@ public class MainActivity extends Activity {
      * @param description The text to display.
      */
     public void failure(String description) {
+    	Log.e(TAG, String.format("Failure: %s", description));
     	updateText(description, false, Color.RED);
     }
     
@@ -143,6 +178,7 @@ public class MainActivity extends Activity {
      * @param color The color of the text.
      */
     public void updateText(String text, boolean isWorking, int color) {
+    	Log.d(TAG, String.format("Setting Result Text.  Text: %s, isWorking: %b, Color: %d", text, isWorking, color));
     	TextView resultLabel = (TextView) findViewById(R.id.result);
     	resultLabel.setText(text);
     	resultLabel.setTextColor(color);
