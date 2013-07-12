@@ -10,11 +10,17 @@
 
 #import "FirstAppViewController.h"
 #import "AFNetworking.h"
+#import <FacebookSDK/FacebookSDK.h>
+#include <asl.h>
 
 @interface FirstAppViewController ()
 - (IBAction)signUpAction:(id)sender;
+- (IBAction)toggleFacebook:(UISwitch*)sender;
+- (void)authenticateWithFacebook;
+- (void)createUser:(NSString*)username;
 @property (weak, nonatomic) IBOutlet UITextField *usernameField;
 @property (weak, nonatomic) IBOutlet UILabel *resultsLabel;
+@property (weak, nonatomic) IBOutlet UISwitch *facebookSwitch;
 
 @end
 
@@ -51,12 +57,23 @@
 
 - (IBAction)signUpAction:(id)sender
 {
+   
+    [self updateText:@"Working..."];
+
+    
+    if(self.facebookSwitch.on) {
+        [self authenticateWithFacebook];
+    } else {
+        [self createUser:self.usernameField.text];
+    }
+
+}
+
+- (void)createUser:(NSString*)username
+{
     UIDevice *device = [UIDevice currentDevice];
-    NSString *username = self.usernameField.text;
     NSString *deviceId = [device.identifierForVendor UUIDString];
     NSString *deviceType = [NSString stringWithFormat:@"%@|%@|%@", device.model, device.systemName, device.systemVersion];
-    
-    [self updateText:@"Working..."];
     
     NSError* error;
     
@@ -102,6 +119,72 @@
     
     [operation start];
     
+}
+
+- (IBAction)toggleFacebook:(UISwitch*)sender {
+    if(sender.on) {
+        self.usernameField.text = @"";
+    }
+    self.usernameField.enabled = !(sender.on);
+}
+
+- (void)authenticateWithFacebook {
+    NSLog(@"Authenticating With Facebook");
+    [self updateText:@"Authenticating With Facebook..."];
+    [FBSession openActiveSessionWithReadPermissions:@[@"basic_info", @"email"] allowLoginUI:YES completionHandler:
+     ^(FBSession *session,
+       FBSessionState state, NSError *error) {
+         NSLog(@"Received Response From Facebook");
+         [self sessionStateChanged:session state:state error:error];
+     }];
+}
+
+- (void)sessionStateChanged:(FBSession *)session
+                      state:(FBSessionState) state
+                      error:(NSError *)error
+{
+    switch (state) {
+        case FBSessionStateOpen: 
+            if (FBSession.activeSession.isOpen) {
+                [[FBRequest requestForMe] startWithCompletionHandler:
+                 ^(FBRequestConnection *connection,
+                   NSDictionary<FBGraphUser> *user,
+                   NSError *error) {
+                     if (!error) {
+                         [self createUser:[user objectForKey:@"email"]];
+                     } else {
+                         [self updateText:@"Error Retrieving Email Address From Facebook" color:[UIColor redColor]];
+                     }
+                 }];      
+            } else {
+                NSLog(@"Session Not Open, Despite Changing To Open State");
+                [self updateText:@"Facebook Login Failed" color:[UIColor redColor]];
+            }
+            break;
+        case FBSessionStateClosedLoginFailed:
+            NSLog(@"Facebook Login Failed");
+            [self updateText:@"Facebook Login Failed" color:[UIColor redColor]];
+            [FBSession.activeSession closeAndClearTokenInformation];
+            break;
+        case FBSessionStateClosed:
+            NSLog(@"Facebook State Closed");
+            [FBSession.activeSession closeAndClearTokenInformation];
+            break;
+        default:
+            NSLog(@"Unknown Facebook State: %u", state);
+            [self updateText:@"Unknown State" color:[UIColor redColor]];
+            break;
+    }
+    
+    if (error) {
+        UIAlertView *alertView = [[UIAlertView alloc]
+                                  initWithTitle:@"Error"
+                                  message:error.localizedDescription
+                                  delegate:nil
+                                  cancelButtonTitle:@"OK"
+                                  otherButtonTitles:nil];
+        [alertView show];
+    }    
 }
 
 @end
