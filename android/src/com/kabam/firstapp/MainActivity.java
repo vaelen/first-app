@@ -23,16 +23,14 @@ import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.util.Log;
 import android.view.Menu;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
+import com.facebook.widget.LoginButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
@@ -46,11 +44,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 	public static final String CONTENT_TYPE = "application/json;charset=utf8";
 	
 	private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
-	
-	public static final int[] loginMethodToggleButtons = {
-		R.id.toggleFacebook,
-		R.id.toggleGoogle
-	};
 	
 	private ProgressDialog progressDialog;
     private PlusClient googlePlusClient;
@@ -66,6 +59,30 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Signing in...");
+        
+        Session.StatusCallback statusCallback = new Session.StatusCallback() {
+			@Override
+			public void call(Session session, SessionState state, Exception exception) {
+				if(session.isOpened()) {
+					Request.executeMeRequestAsync(session, new Request.GraphUserCallback() {
+						@Override
+						public void onCompleted(GraphUser user, Response response) {
+							Object email = user.getProperty("email");
+							Log.i(TAG, String.format("Email Address From Facebook: %s", email));
+							if(email == null) {
+								Log.e(TAG, "No email address was returned from Facebook.");
+							} else {
+								createAccount(email.toString());
+							}
+						}
+					});
+				}
+			}
+		};
+		
+		LoginButton loginButton = (LoginButton) findViewById(R.id.facebookAuthButton);
+		loginButton.setSessionStatusCallback(statusCallback);
+		
     }
 
 
@@ -87,87 +104,8 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         }
     }
     
-    public void toggleLoginMethodButton(int buttonId) {
-    	ToggleButton toggleButton = (ToggleButton) findViewById(buttonId);
-		boolean loginMethodChecked = false;
-    	if(toggleButton.isChecked()) {
-    		// Uncheck other login methods
-    		for(int id: loginMethodToggleButtons) {
-    			if(id != buttonId) {
-    				ToggleButton loginMethodButton = (ToggleButton) findViewById(id);
-    				loginMethodButton.setChecked(false);
-    			}
-    		}
-    		loginMethodChecked = true;
-    	} else {
-    		for(int id: loginMethodToggleButtons) {
-				ToggleButton loginMethodButton = (ToggleButton) findViewById(id);
-				if(loginMethodButton.isChecked()) {
-					loginMethodChecked = true;
-					break;
-				}
-    		}
-    	}
-
-    	EditText usernameField = (EditText) findViewById(R.id.username);
-		if (loginMethodChecked) {
-    		usernameField.setText("");
-    		usernameField.setEnabled(false);
-		} else {
-			usernameField.setEnabled(true);
-		}
-	
-    }
-    
-    /**
-     * This is called when the 'Login With Facebook' button is toggled. 
-     */
-    public void toggleFacebookLogin(View view) {
-    	toggleLoginMethodButton(R.id.toggleFacebook);
-    }
-    
-    /**
-     * This is called when the 'Login With Google' button is toggled. 
-     */
-    public void toggleGoogleLogin(View view) {
-    	toggleLoginMethodButton(R.id.toggleGoogle);
-    }
-    
-    /** This is called when the 'Create Account' button is clicked. */
-    public void createAccountOnClick(View view) {
-    	Log.i(TAG, "createAccountOnClick");
-    	if(((ToggleButton) findViewById(R.id.toggleFacebook)).isChecked()) {
-    		authenticateWithFacebook();
-    	} else if(((ToggleButton) findViewById(R.id.toggleGoogle)).isChecked()) {
-        	authenticateWithGoogle();
-    	} else {
-	    	EditText usernameField = (EditText) findViewById(R.id.username);
-	    	String username = usernameField.getText().toString();
-	    	Log.i(TAG, String.format("Email Address: %s", username));
-	    	createAccount(username);
-    	}
-    }
-
 	public void authenticateWithFacebook() {
-		Session.openActiveSession(this, true, new Session.StatusCallback() {
-			@Override
-			public void call(Session session, SessionState state, Exception exception) {
-				if(session.isOpened()) {
-					Request.executeMeRequestAsync(session, new Request.GraphUserCallback() {
-						@Override
-						public void onCompleted(GraphUser user, Response response) {
-							Object email = user.getProperty("email");
-							Log.i(TAG, String.format("Email Address From Facebook: %s", email));
-							if(email == null) {
-								Log.e(TAG, "No email address was returned from Facebook.");
-							} else {
-								createAccount(email.toString());
-							}
-						}
-					});
-				}
-			}
-		});
+		Session.openActiveSession(this, true, null);
 	}
 	
 	public void authenticateWithGoogle() {
@@ -333,6 +271,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     	progressDialog.dismiss();
     	String accountName = googlePlusClient.getAccountName();
         Toast.makeText(this, accountName + " is connected.", Toast.LENGTH_LONG).show();
+        createAccount(accountName);
     }
     
     public void onDisconnected() {
