@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 import android.widget.Toast;
 
 import com.facebook.Request;
@@ -34,6 +35,8 @@ import com.facebook.widget.LoginButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.plus.GooglePlusUtil;
 import com.google.android.gms.plus.PlusClient;
 
 public class MainActivity extends Activity implements ConnectionCallbacks, OnConnectionFailedListener {
@@ -56,9 +59,15 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         googlePlusClient = new PlusClient.Builder(this, this, this)
         	.setVisibleActivities("http://schemas.google.com/AddActivity", "http://schemas.google.com/BuyActivity")
         	.build();
-
+        
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Signing in...");
+        
+        findViewById(R.id.googlePlusAuthButton).setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				authenticateGoogleOnClick(v);
+			}
+		});
         
         Session.StatusCallback statusCallback = new Session.StatusCallback() {
 			@Override
@@ -85,7 +94,23 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 		
     }
 
-
+    public void authenticateGoogleOnClick(View view) {
+    	Log.d(TAG, "authenticateGoogleOnClick");
+//    	int errorCode = GooglePlusUtil.checkGooglePlusApp(this);
+//    	if (errorCode != GooglePlusUtil.SUCCESS) {
+//    	  GooglePlusUtil.getErrorDialog(errorCode, this, 0).show();
+//    	} else {
+	    	if (view.getId() == R.id.googlePlusAuthButton && !googlePlusClient.isConnected()) {
+	    		if(connectionResult == null) {
+	    			startingActivity("Authenticating With G+");
+	    			googlePlusClient.connect();
+	    		} else {
+	    			resolveConnectionResult(connectionResult);
+	    		}
+	    	}
+//    	}
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -99,18 +124,10 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         if (requestCode == REQUEST_CODE_RESOLVE_ERR && resultCode == RESULT_OK) {
 	        connectionResult = null;
 	        googlePlusClient.connect();
-        } else {
+        } else if (Session.getActiveSession() != null) {
         	Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
         }
     }
-    
-	public void authenticateWithFacebook() {
-		Session.openActiveSession(this, true, null);
-	}
-	
-	public void authenticateWithGoogle() {
-		googlePlusClient.connect();
-	}
     
     /**
      * Attempts to create the given account.
@@ -248,17 +265,12 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     }
     
     public void onConnectionFailed(ConnectionResult result) {
+    	Log.d(TAG, "onConnectionFailed");
     	if (progressDialog.isShowing()) {
     		// The user clicked the sign-in button already. Start to resolve
     		// connection errors. Wait until onConnected() to dismiss the
     		// connection dialog.
-    		if (result.hasResolution()) {
-    			try {
-    				result.startResolutionForResult(this, REQUEST_CODE_RESOLVE_ERR);
-    			} catch (SendIntentException e) {
-    				googlePlusClient.connect();
-    			}
-    		}
+    		resolveConnectionResult(result);
     	}
 
     	// Save the intent so that we can start an activity when the user clicks
@@ -266,16 +278,32 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     	connectionResult = result;
     }
 
+	public void resolveConnectionResult(ConnectionResult result) {
+		if (result.hasResolution()) {
+			try {
+				Log.d(TAG, "Trying to resolve result: " + result);
+				result.startResolutionForResult(this, REQUEST_CODE_RESOLVE_ERR);
+			} catch (SendIntentException e) {
+				Log.d(TAG, "Reconnecting to G+");
+				googlePlusClient.connect();
+			}
+		} else {
+			Log.e(TAG, "Connection to G+ Failed : " + result);
+			failure("Connection to G+ Failed");
+			GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), this, 0).show();
+		}
+	}
+
     public void onConnected(Bundle connectionHint) {
     	// We've resolved any connection errors.
+    	Log.d(TAG, "onConnected");
     	progressDialog.dismiss();
     	String accountName = googlePlusClient.getAccountName();
-        Toast.makeText(this, accountName + " is connected.", Toast.LENGTH_LONG).show();
         createAccount(accountName);
     }
     
     public void onDisconnected() {
-    	Log.d(TAG, "disconnected");
+    	Log.d(TAG, "onDisconnected");
     }
 
     

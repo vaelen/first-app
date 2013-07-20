@@ -370,37 +370,39 @@ containing a value of this type.
         public static final int ic_launcher=0x7f020037;
     }
     public static final class id {
-        public static final int action_settings=0x7f05001e;
-        public static final int com_facebook_login_activity_progress_bar=0x7f05000b;
-        public static final int com_facebook_picker_activity_circle=0x7f05000a;
-        public static final int com_facebook_picker_checkbox=0x7f05000d;
-        public static final int com_facebook_picker_checkbox_stub=0x7f050011;
-        public static final int com_facebook_picker_divider=0x7f050015;
-        public static final int com_facebook_picker_done_button=0x7f050014;
-        public static final int com_facebook_picker_image=0x7f05000e;
-        public static final int com_facebook_picker_list_section_header=0x7f050012;
-        public static final int com_facebook_picker_list_view=0x7f050009;
-        public static final int com_facebook_picker_profile_pic_stub=0x7f05000f;
-        public static final int com_facebook_picker_row_activity_circle=0x7f05000c;
-        public static final int com_facebook_picker_title=0x7f050010;
-        public static final int com_facebook_picker_title_bar=0x7f050017;
-        public static final int com_facebook_picker_title_bar_stub=0x7f050016;
-        public static final int com_facebook_picker_top_bar=0x7f050013;
-        public static final int com_facebook_placepickerfragment_search_box_stub=0x7f050018;
-        public static final int com_facebook_usersettingsfragment_login_button=0x7f05001d;
-        public static final int com_facebook_usersettingsfragment_logo_image=0x7f05001b;
-        public static final int com_facebook_usersettingsfragment_profile_name=0x7f05001c;
-        public static final int facebookAuthButton=0x7f050008;
-        public static final int googlePlusAuthButton=0x7f050007;
+        public static final int RelativeLayout=0x7f050007;
+        public static final int action_settings=0x7f050020;
+        public static final int com_facebook_login_activity_progress_bar=0x7f05000d;
+        public static final int com_facebook_picker_activity_circle=0x7f05000c;
+        public static final int com_facebook_picker_checkbox=0x7f05000f;
+        public static final int com_facebook_picker_checkbox_stub=0x7f050013;
+        public static final int com_facebook_picker_divider=0x7f050017;
+        public static final int com_facebook_picker_done_button=0x7f050016;
+        public static final int com_facebook_picker_image=0x7f050010;
+        public static final int com_facebook_picker_list_section_header=0x7f050014;
+        public static final int com_facebook_picker_list_view=0x7f05000b;
+        public static final int com_facebook_picker_profile_pic_stub=0x7f050011;
+        public static final int com_facebook_picker_row_activity_circle=0x7f05000e;
+        public static final int com_facebook_picker_title=0x7f050012;
+        public static final int com_facebook_picker_title_bar=0x7f050019;
+        public static final int com_facebook_picker_title_bar_stub=0x7f050018;
+        public static final int com_facebook_picker_top_bar=0x7f050015;
+        public static final int com_facebook_placepickerfragment_search_box_stub=0x7f05001a;
+        public static final int com_facebook_usersettingsfragment_login_button=0x7f05001f;
+        public static final int com_facebook_usersettingsfragment_logo_image=0x7f05001d;
+        public static final int com_facebook_usersettingsfragment_profile_name=0x7f05001e;
+        public static final int facebookAuthButton=0x7f05000a;
+        public static final int googlePlusAuthButton=0x7f050008;
         public static final int hybrid=0x7f050004;
         public static final int large=0x7f050006;
         public static final int none=0x7f050000;
         public static final int normal=0x7f050001;
-        public static final int picker_subtitle=0x7f05001a;
+        public static final int picker_subtitle=0x7f05001c;
         public static final int satellite=0x7f050002;
-        public static final int search_box=0x7f050019;
+        public static final int search_box=0x7f05001b;
         public static final int small=0x7f050005;
         public static final int terrain=0x7f050003;
+        public static final int textView1=0x7f050009;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -423,7 +425,7 @@ containing a value of this type.
     }
     public static final class string {
         public static final int action_settings=0x7f06002f;
-        public static final int app_id=0x7f060033;
+        public static final int app_id=0x7f060030;
         public static final int app_name=0x7f06002e;
         /**   Title for notification shown when GooglePlayServices needs to be
         enabled for a application to work. [CHAR LIMIT=70] 
@@ -528,11 +530,7 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f06000e;
-        public static final int create_account=0x7f060030;
-        public static final int create_account_button=0x7f060032;
-        public static final int facebook_login_label=0x7f060034;
-        public static final int google_login_label=0x7f060035;
-        public static final int user_name=0x7f060031;
+        public static final int login=0x7f060031;
     }
     public static final class style {
         /** 
