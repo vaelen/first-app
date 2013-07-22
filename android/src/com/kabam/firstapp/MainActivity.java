@@ -298,7 +298,9 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     	// We've resolved any connection errors.
     	Log.d(TAG, "onConnected");
     	progressDialog.dismiss();
+    	Log.d(TAG, "Dismissed Progress Dialog");
     	String accountName = googlePlusClient.getAccountName();
+    	Log.i(TAG, String.format("Acount name from G+: %s", accountName));
         createAccount(accountName);
     }
     
